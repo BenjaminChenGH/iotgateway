@@ -5,19 +5,19 @@ namespace IoTGateway.Model
 {
     public class SystemConfig : BasePoco
     {
-        [Display(Name = "网关名称")]
+        [Display(Name = "GatewayName")]
         public string GatewayName { get; set; }
         [Display(Name = "ClientId")]
         public string ClientId { get; set; }
-        [Display(Name = "Mqtt服务器")]
+        [Display(Name = "MqttServer ")]
         public string MqttIp { get; set; }
-        [Display(Name = "Mqtt端口")]
+        [Display(Name = "MqttPort")]
         public int MqttPort { get; set; }
-        [Display(Name = "Mqtt用户名")]
+        [Display(Name = "UserName")]
         public string MqttUName { get; set; }
-        [Display(Name = "Mqtt密码")]
+        [Display(Name = "Password")]
         public string MqttUPwd { get; set; }
-        [Display(Name = "输出平台")]
+        [Display(Name = "OutputPlatform")]
         public IoTPlatformType IoTPlatformType { get; set; }
     }
     public enum IoTPlatformType
@@ -26,17 +26,19 @@ namespace IoTGateway.Model
         ThingsBoard =0,
         [Display(Name = "IoTSharp")]
         IoTSharp =1,
-        [Display(Name = "阿里物联网平台")]
+        [Display(Name = "AliIoT")]
         AliCloudIoT=2,
-        [Display(Name = "腾讯智能云")]
+        [Display(Name = "TencentIoTHub")]
         TencentIoTHub =3,
-        [Display(Name = "百度物联网通信")]
+        [Display(Name = "BaiduIoTCore")]
         BaiduIoTCore =4,
-        [Display(Name = "中移OneNet")]
+        [Display(Name = "OneNet")]
         OneNET = 5,
         [Display(Name = "ThingsCloud")]
         ThingsCloud = 6,
-        [Display(Name = "华为云")]
-        HuaWei = 7
+        [Display(Name = "HuaWeiCloud")]
+        HuaWei = 7,
+        [Display(Name = "IoTGateway")]
+        IoTGateway = 8
     }
 }

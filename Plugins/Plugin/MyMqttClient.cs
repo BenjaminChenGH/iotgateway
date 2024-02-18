@@ -64,9 +64,12 @@ namespace Plugin
                 Client.DisconnectedAsync += Client_DisconnectedAsync;
                 Client.ApplicationMessageReceivedAsync += Client_ApplicationMessageReceivedAsync;
 
-                await Client.ConnectAsync(_options);
+                if(Client.ConnectAsync(_options).IsCompletedSuccessfully) ;
+                {
+                 _logger.LogInformation("MQTT WAITING FOR APPLICATION MESSAGES");
+                }
 
-                _logger.LogInformation("MQTT WAITING FOR APPLICATION MESSAGES");
+               
             }
             catch (Exception ex)
             {
@@ -91,6 +94,7 @@ namespace Plugin
                         await Client.SubscribeAsync("v1/gateway/attributes", MqttQualityOfServiceLevel.ExactlyOnce);
                         break;
                     case IoTPlatformType.IoTSharp:
+                    case IoTPlatformType.IoTGateway:
                         await Client.SubscribeAsync("devices/+/rpc/request/+/+", MqttQualityOfServiceLevel.ExactlyOnce);
                         await Client.SubscribeAsync("devices/+/attributes/update", MqttQualityOfServiceLevel.ExactlyOnce);
                         //Message: {"device": "Device A", "data": {"attribute1": "value1", "attribute2": 42}}
@@ -382,6 +386,7 @@ namespace Plugin
                         await ResponseTbRpcAsync(tRpcResponse);
                         break;
                     case IoTPlatformType.IoTSharp:
+                    case IoTPlatformType.IoTGateway:
                         await ResponseIsRpcAsync(new ISRpcResponse
                         {
                             DeviceId = rpcResponse.DeviceName,
@@ -432,6 +437,7 @@ namespace Plugin
                             .WithPayload(JsonConvert.SerializeObject(tbRequestData)).WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce).Build());
                         break;
                     case IoTPlatformType.IoTSharp:
+                    case IoTPlatformType.IoTGateway:
                         string topic = $"devices/{deviceName}/attributes/request/{id}";
                         Dictionary<string, string> keys = new Dictionary<string, string>();
                         keys.Add(anySide ? "anySide" : "server", string.Join(",", args));
@@ -509,7 +515,7 @@ namespace Plugin
         {
             try
             {
-                if (CanPubTelemetry(deviceName ,device, sendModel))
+                if (CanPubTelemetry(deviceName, device, sendModel))
                 {
                     switch (_systemConfig.IoTPlatformType)
                     {
@@ -519,11 +525,13 @@ namespace Plugin
                                 .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtMostOnce).Build());
                             break;
                         case IoTPlatformType.IoTSharp:
+                        case IoTPlatformType.IoTGateway:
                             foreach (var payload in sendModel[deviceName])
                             {
                                 if (payload.Values != null)
                                 {
-                                    payload.Values["_ts_"] = (long)(DateTime.UtcNow - _tsStartDt).TotalMilliseconds;
+                                    if (_systemConfig.IoTPlatformType == IoTPlatformType.IoTGateway)
+                                        payload.Values["_ts_"] = (long)(DateTime.UtcNow - _tsStartDt).TotalMilliseconds;
                                     await UploadIsTelemetryDataAsync(deviceName, payload.Values);
                                 }
                             }
@@ -555,13 +563,13 @@ namespace Plugin
                     }
                 }
 
-                //foreach (var payload in sendModel[DeviceName])
+                //foreach (var payload in sendModel[deviceName])
                 //{
                 //    if (payload.Values != null)
                 //        foreach (var kv in payload.Values)
                 //        {
                 //            //更新到UAService
-                //            _uaNodeManager?.UpdateNode($"{device.Parent.DeviceName}.{DeviceName}.{kv.Key}",
+                //            _uaNodeManager?.UpdateNode($"{device.Parent.DeviceName}.{deviceName}.{kv.Key}",
                 //                kv.Value);
                 //        }
                 //}
@@ -574,7 +582,7 @@ namespace Plugin
 
         private readonly DateTime _tsStartDt = new(1970, 1, 1);
 
-        public async Task DeviceConnected(string DeviceName ,Device device)
+        public async Task DeviceConnected(string DeviceName, Device device)
         {
             try
             {
@@ -582,6 +590,7 @@ namespace Plugin
                 {
                     case IoTPlatformType.ThingsBoard:
                     case IoTPlatformType.IoTSharp:
+                    case IoTPlatformType.IoTGateway:
                         await Client.PublishAsync(new MqttApplicationMessageBuilder().WithTopic("v1/gateway/connect")
                             .WithPayload(JsonConvert.SerializeObject(new Dictionary<string, string>
                                 { { "device", DeviceName } }))
@@ -636,6 +645,7 @@ namespace Plugin
                 {
                     case IoTPlatformType.ThingsBoard:
                     case IoTPlatformType.IoTSharp:
+                    case IoTPlatformType.IoTGateway:
                         await Client.PublishAsync(new MqttApplicationMessageBuilder().WithTopic($"v1/gateway/disconnect")
                             .WithPayload(JsonConvert.SerializeObject(new Dictionary<string, string>
                                 { { "device", DeviceName } }))

@@ -30,6 +30,8 @@ RUN dotnet publish "IoTGateway.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
+COPY drivers /app/drivers/
+COPY 3d /app/wwwroot/3d/
 COPY --from=publish /app/publish .
 
 ENV TZ=Asia/Shanghai

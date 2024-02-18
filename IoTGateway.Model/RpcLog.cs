@@ -10,38 +10,38 @@ namespace IoTGateway.Model
 {
     public class RpcLog:TopBasePoco
     {
-        [Display(Name = "发起方")]
+        [Display(Name = "RpcSide")]
         public RpcSide RpcSide { get; set; }    
 
-        [Display(Name = "开始时间")]
+        [Display(Name = "StartTime")]
         public DateTime StartTime { get; set; }
 
         public Device Device { get; set; }
 
-        [Display(Name = "设备名")]
+        [Display(Name = "Device")]
         public Guid? DeviceId { get; set; }
 
-        [Display(Name = "方法名")]
+        [Display(Name = "Method")]
         public string Method { get; set; }
 
-        [Display(Name = "请求参数")]
+        [Display(Name = "Parameters")]
         public string Params { get; set; }
 
-        [Display(Name = "结束时间")]
+        [Display(Name = "EndTime")]
         public DateTime EndTime { get; set; }
 
-        [Display(Name = "结果")]
+        [Display(Name = "IsSuccess")]
         public bool IsSuccess { get; set; }
 
-        [Display(Name = "描述")]
+        [Display(Name = "Description")]
         public string Description { get; set; }
     }
 
     public enum RpcSide
     {
-        [Display(Name ="服务端请求")]
+        [Display(Name = "ServerSide")]
         ServerSide=1,
-        [Display(Name = "客户端请求")]
+        [Display(Name = "ClientSide")]
         ClientSide =1
     }
 }

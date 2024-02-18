@@ -21,7 +21,7 @@ namespace IoTGateway.ViewModel.BasicData.DeviceVariableVMs
         {
             return new List<GridAction>
             {
-                this.MakeAction("DeviceVariable","SetValue","写入值","写入值", GridActionParameterTypesEnum.MultiIds,"BasicData",600).SetIconCls("_wtmicon _wtmicon-xiayibu").SetHideOnToolBar(false).SetShowInRow(false).SetBindVisiableColName("setValue"),
+                this.MakeAction("DeviceVariable","SetValue",Localizer["WriteValue"],Localizer["WriteValue"], GridActionParameterTypesEnum.MultiIds,"BasicData",600).SetIconCls("_wtmicon _wtmicon-xiayibu").SetHideOnToolBar(false).SetShowInRow(false).SetBindVisiableColName("setValue"),
                 this.MakeStandardAction("DeviceVariable", GridActionStandardTypesEnum.Create, Localizer["Sys.Create"],"BasicData", dialogWidth: 800),
                 this.MakeStandardAction("DeviceVariable", GridActionStandardTypesEnum.Edit, Localizer["Sys.Edit"], "BasicData", dialogWidth: 800),
                 this.MakeStandardAction("DeviceVariable", GridActionStandardTypesEnum.Delete, Localizer["Sys.Delete"], "BasicData", dialogWidth: 800),
@@ -41,20 +41,24 @@ namespace IoTGateway.ViewModel.BasicData.DeviceVariableVMs
                 .GetTreeSelectListItems(Wtm, x => x.DeviceName);
 
             var deviceService = Wtm.ServiceProvider.GetService(typeof(DeviceService)) as DeviceService;
-            foreach (var device in AllDevices)
+            Parallel.ForEach(AllDevices, device =>
             {
-                foreach (var item in device.Children)
+                Parallel.ForEach(device.Children, item =>
                 {
-                    var deviceThread = deviceService.DeviceThreads.Where(x => x.Device.ID.ToString() == (string)item.Value).FirstOrDefault();
+                    var deviceThread = deviceService.DeviceThreads.FirstOrDefault(x => x.Device.ID.ToString() == (string)item.Value);
                     if (deviceThread != null)
-                        item.Icon = deviceThread.Device.AutoStart ? (deviceThread.Driver.IsConnected ? "layui-icon layui-icon-link" : "layui-icon layui-icon-unlink") : "layui-icon layui-icon-pause";
+                        item.Icon = deviceThread.Device.AutoStart
+                            ? (deviceThread.Driver.IsConnected
+                                ? "layui-icon layui-icon-link"
+                                : "layui-icon layui-icon-unlink")
+                            : "layui-icon layui-icon-pause";
 
                     item.Text = " " + item.Text;
                     item.Expended = true;
                     item.Selected = item.Value.ToString() == IoTBackgroundService.VariableSelectDeviceId.ToString();
 
-                }
-            }
+                });
+            });
             DevicesTree = GetLayuiTree(AllDevices);
             base.InitListVM();
         }
@@ -78,7 +82,7 @@ namespace IoTGateway.ViewModel.BasicData.DeviceVariableVMs
                 }),
                 this.MakeGridHeader(x => x.Expressions).SetWidth(150),
                 this.MakeGridHeader(x => x.IsUpload).SetWidth(80),
-                //this.MakeGridHeader(x => x.ProtectType).SetSort(true),
+                this.MakeGridHeader(x => x.ProtectType).SetWidth(80).SetSort(true),
                 this.MakeGridHeader(x => x.DeviceName_view).SetSort(true).SetWidth(90),
                 this.MakeGridHeader(x => x.Alias).SetSort(true).SetWidth(90),
                 this.MakeGridHeader(x => x.Timestamp).SetWidth(100).SetFormat((a,b)=>{
@@ -99,7 +103,7 @@ namespace IoTGateway.ViewModel.BasicData.DeviceVariableVMs
         public override void AfterDoSearcher()
         {
             var deviceService = Wtm.ServiceProvider.GetService(typeof(DeviceService)) as DeviceService;
-            foreach (var item in EntityList)
+            Parallel.ForEach(EntityList, item =>
             {
                 var dapThread = deviceService!.DeviceThreads.FirstOrDefault(x => x.Device.ID == item.DeviceId);
                 var variable = dapThread?.Device?.DeviceVariables?.FirstOrDefault(x => x.ID == item.ID);
@@ -111,7 +115,7 @@ namespace IoTGateway.ViewModel.BasicData.DeviceVariableVMs
                     item.StatusType = variable.StatusType;
                     item.Timestamp = variable.Timestamp;
                 }
-            }
+            });
 
         }
         public override IOrderedQueryable<DeviceVariable_View> GetSearchQuery()
@@ -206,7 +210,7 @@ namespace IoTGateway.ViewModel.BasicData.DeviceVariableVMs
 
     public class DeviceVariable_View : DeviceVariable
     {
-        [Display(Name = "设备名")]
+        [Display(Name = "DeviceName")]
         public string DeviceName_view { get; set; }
     }
 }

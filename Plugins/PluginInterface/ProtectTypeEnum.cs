@@ -9,9 +9,11 @@ namespace PluginInterface
 {
     public enum ProtectTypeEnum
     {
-        [Display(Name = "只读")]
+        [Display(Name = "ReadOnly")]
         ReadOnly,
-        [Display(Name = "读写")]
+        [Display(Name = "ReadWrite")]
         ReadWrite,
+        [Display(Name = "WriteOnly")]
+        WriteOnly,
     }
 }

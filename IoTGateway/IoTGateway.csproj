@@ -7,16 +7,17 @@
 		<SatelliteResourceLanguages>zh-Hans,en</SatelliteResourceLanguages>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
-		<PackageReference Include="MQTTnet" Version="4.1.4.563" />
-		<PackageReference Include="MQTTnet.AspNetCore" Version="4.1.4.563" />
-		<PackageReference Include="MQTTnet.Extensions.Rpc" Version="4.1.4.563" />
-		<PackageReference Include="NLog" Version="5.1.3" />
-		<PackageReference Include="NLog.Web.AspNetCore" Version="5.2.3" />
+		<PackageReference Include="MQTTnet" Version="4.3.1.873" />
+		<PackageReference Include="MQTTnet.AspNetCore" Version="4.3.1.873" />
+		<PackageReference Include="MQTTnet.Extensions.Rpc" Version="4.3.1.873" />
+		<PackageReference Include="NLog" Version="5.2.5" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.5" />
 		<PackageReference Include="System.IO.Ports" Version="6.0.0" />
 	</ItemGroup>
 
@@ -26,6 +27,15 @@
 		<ProjectReference Include="..\IoTGateway.ViewModel\IoTGateway.ViewModel.csproj" />
 		<ProjectReference Include="..\WalkingTec.Mvvm\WalkingTec.Mvvm.Mvc\WalkingTec.Mvvm.Mvc.csproj" />
 		<ProjectReference Include="..\WalkingTec.Mvvm\WalkingTec.Mvvm.TagHelpers.LayUI\WalkingTec.Mvvm.TagHelpers.LayUI.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="iotgateway.db">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Quickstarts.ReferenceServer.Config.xml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>
